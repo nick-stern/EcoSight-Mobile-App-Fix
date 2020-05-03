@@ -9,6 +9,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -30,8 +31,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -114,12 +119,14 @@ public class Camera extends AppCompatActivity {
                 resultsIntent.putExtra("lon",longitude);
                 resultsIntent.putExtra("name",name);
                 resultsIntent.putExtra("fp",filePath);
+
+                //send image to python socket server
+                send sendimg = new send();
+                sendimg.execute();
+
                 startActivity(resultsIntent);
             }
         });
-
-
-
 
     }
 
@@ -204,4 +211,42 @@ public class Camera extends AppCompatActivity {
         filePath.add(pathToFile);
         return image;
     }
+
+    //class to communicate with python server via a socket
+    class send extends AsyncTask<Void,Void,Void> {
+        //socket variable
+        Socket s;
+
+        @Override
+        protected Void doInBackground(Void...params){
+            try { //TODO : change to get IP address of current machine
+                s = new Socket("10.10.188.13",8000); //connects to Leidy's IP address, will need to be changed
+                InputStream input = new FileInputStream(pathToFile);
+
+                try {
+                    try {
+                        //Reads bytes all together
+                        int bytesRead;
+                        while ((bytesRead = input.read()) != -1) {
+                            s.getOutputStream().write(bytesRead); //Writes bytes to output stream
+                        }
+                    } finally {
+                        //Flushes and closes socket
+                        s.getOutputStream().flush();
+                        s.close();
+                    }
+                } finally {
+                    input.close();
+                }
+            } catch (UnknownHostException e) {
+                System.out.println("Fail");
+                e.printStackTrace();
+            } catch (IOException e) {
+                System.out.println("Fail");
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+    
 }
