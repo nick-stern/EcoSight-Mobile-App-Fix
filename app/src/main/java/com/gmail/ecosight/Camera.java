@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.icu.util.Output;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -30,10 +31,17 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.BufferedReader;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -51,6 +59,7 @@ public class Camera extends AppCompatActivity {
     Button SendPhotoBtn;
     ImageView imageview;
     String pathToFile;
+    String resultOfImage;
 
     FusedLocationProviderClient fusedLocationProviderClient;
     Double currentLat;
@@ -220,8 +229,13 @@ public class Camera extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void...params){
             try { //TODO : change to get IP address of current machine
-                s = new Socket("10.10.188.13",8000); //connects to Leidy's IP address, will need to be changed
+                s = new Socket("169.254.53.255",8000); //connects to Leidy's IP address, will need to be changed
                 InputStream input = new FileInputStream(pathToFile);
+
+                //DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+                DataInputStream dis = new DataInputStream(s.getInputStream());
+                //BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+                boolean recvData = true;
 
                 try {
                     try {
@@ -229,6 +243,29 @@ public class Camera extends AppCompatActivity {
                         int bytesRead;
                         while ((bytesRead = input.read()) != -1) {
                             s.getOutputStream().write(bytesRead); //Writes bytes to output stream
+                        }
+                        while(recvData) {
+                            //dos.writeUTF(br.readLine());
+                            //System.out.println("He says: " + dis.readUTF());
+                            // dos.flush();
+                            String result = dis.readUTF();
+                            switch (result) {
+                                case("daffodil"):
+                                    resultOfImage = "Classification: Daffodil\n\netc";
+                                    break;
+                                case("daisy"):
+                                    resultOfImage = "Classification: Daisy\n\netc";
+                                    break;
+                                case("pansy"):
+                                    resultOfImage = "Classification: Pansy\n\netc";
+                                    break;
+                                case("sunflower"):
+                                    resultOfImage = "Classification: Sunflower\n\netc";
+                                    break;
+                                default:
+                                    recvData = false;
+
+                            }
                         }
                     } finally {
                         //Flushes and closes socket
