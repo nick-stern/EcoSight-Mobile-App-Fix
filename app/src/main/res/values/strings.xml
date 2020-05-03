@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">EcoSight</string>
+    <string name="title_activity_maps">Map</string>
+
+    <string-array name="latitude">
+        <item>33.5779</item>
+        <item>33.580978</item>
+        <item>33.584473</item>
+        <item>33.587529</item>
+        <item>33.579418</item>
+    </string-array>
+
+    <string-array name="longitude">
+        <item>-101.8552</item>
+        <item>-101.882126</item>
+        <item>-101.874684</item>
+        <item>-101.874686</item>
+        <item>-101.872590</item>
+    </string-array>
+
+    <string-array name="cities">
+        <item>Lubbock, Texas</item>
+        <item>Sunflower</item>
+        <item>Coltsfoot</item>
+        <item>Tiger Lilly</item>
+        <item>Pansy</item>
+    </string-array>
+
+</resources>
