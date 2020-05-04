@@ -125,14 +125,15 @@ public class Camera extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent resultsIntent = new Intent(getApplicationContext(), Results.class);
-                resultsIntent.putExtra("lat",latitude);
-                resultsIntent.putExtra("lon",longitude);
-                resultsIntent.putExtra("name",name);
-                resultsIntent.putExtra("fp",filePath);
 
                 //send image to python socket server
                 send sendimg = new send();
                 sendimg.execute();
+
+                resultsIntent.putExtra("lat",latitude);
+                resultsIntent.putExtra("lon",longitude);
+                resultsIntent.putExtra("name",name);
+                resultsIntent.putExtra("fp",filePath);
 
                 startActivity(resultsIntent);
             }
@@ -230,7 +231,7 @@ public class Camera extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void...params){
             try { //TODO : change to get IP address of current machine
-                s = new Socket("localhost",8000); //connects to Leidy's IP address, will need to be changed
+                s = new Socket("192.168.1.96",8000); //connects to Cade's IP address, will need to change
                 InputStream input = new FileInputStream(pathToFile);
 
                 //BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
@@ -246,20 +247,56 @@ public class Camera extends AppCompatActivity {
                         BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
                         String result = br.readLine();
                         switch (result) {
+                            case("buttercup"):
+                                resultOfImage = "Classification: Buttercup\n\netc";
+                                break;
+                            case("coltsfoot"):
+                                resultOfImage = "Classification: Coltsfoot\n\netc";
+                                break;
+                            case("crocus"):
+                                resultOfImage = "Classification: Crocus\n\netc";
+                                break;
                             case("daffodil"):
-                                resultOfImage = "Classification: Daffodil\n\netc";
+                                resultOfImage = "Classification: Daffodil\n\n";
                                 break;
                             case("daisy"):
-                                resultOfImage = "Classification: Daisy\n\netc";
+                                resultOfImage = "Classification: Daisy\n\n";
+                                break;
+                            case("fritillary"):
+                                resultOfImage = "Classification: Fritillary\n\netc";
+                                break;
+                            case("iris"):
+                                resultOfImage = "Classification: Iris\n\netc";
+                                break;
+                            case("lilyvalley"):
+                                resultOfImage = "Classification: Lilyvilley\n\netc";
                                 break;
                             case("pansy"):
-                                resultOfImage = "Classification: Pansy\n\netc";
+                                resultOfImage = "Classification: Pansy\n\n";
+                                break;
+                            case("snowdrop"):
+                                resultOfImage = "Classification: Snowdrop\n\netc";
                                 break;
                             case("sunflower"):
-                                resultOfImage = "Classification: Sunflower\n\netc";
+                                resultOfImage = "Classification: Sunflower\n\n";
+                                break;
+                            case("bluebell"):
+                                resultOfImage = "Classification: Bluebell\n\n";
+                                break;
+                            case("tigerlily"):
+                                resultOfImage = "Classification: Tigerlily\n\netc";
+                                break;
+                            case("cowslip"):
+                                resultOfImage = "Classification: Cowslip\n\n";
+                                break;
+                            case("tulip"):
+                                resultOfImage = "Classification: Tulip\n\n";
+                                break;
+                            case("windflower"):
+                                resultOfImage = "Classification: Windflower\n\netc";
                                 break;
                             default:
-
+                                resultOfImage = "Classification: Unknown!\n\n";
                         }
                     } finally {
                         //Flushes and closes socket
