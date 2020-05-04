@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.net.Socket;
@@ -229,13 +230,10 @@ public class Camera extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void...params){
             try { //TODO : change to get IP address of current machine
-                s = new Socket("169.254.53.255",8000); //connects to Leidy's IP address, will need to be changed
+                s = new Socket("localhost",8000); //connects to Leidy's IP address, will need to be changed
                 InputStream input = new FileInputStream(pathToFile);
 
-                //DataOutputStream dos = new DataOutputStream(s.getOutputStream());
-                DataInputStream dis = new DataInputStream(s.getInputStream());
-                //BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-                boolean recvData = true;
+                //BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
 
                 try {
                     try {
@@ -244,28 +242,24 @@ public class Camera extends AppCompatActivity {
                         while ((bytesRead = input.read()) != -1) {
                             s.getOutputStream().write(bytesRead); //Writes bytes to output stream
                         }
-                        while(recvData) {
-                            //dos.writeUTF(br.readLine());
-                            //System.out.println("He says: " + dis.readUTF());
-                            // dos.flush();
-                            String result = dis.readUTF();
-                            switch (result) {
-                                case("daffodil"):
-                                    resultOfImage = "Classification: Daffodil\n\netc";
-                                    break;
-                                case("daisy"):
-                                    resultOfImage = "Classification: Daisy\n\netc";
-                                    break;
-                                case("pansy"):
-                                    resultOfImage = "Classification: Pansy\n\netc";
-                                    break;
-                                case("sunflower"):
-                                    resultOfImage = "Classification: Sunflower\n\netc";
-                                    break;
-                                default:
-                                    recvData = false;
 
-                            }
+                        BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+                        String result = br.readLine();
+                        switch (result) {
+                            case("daffodil"):
+                                resultOfImage = "Classification: Daffodil\n\netc";
+                                break;
+                            case("daisy"):
+                                resultOfImage = "Classification: Daisy\n\netc";
+                                break;
+                            case("pansy"):
+                                resultOfImage = "Classification: Pansy\n\netc";
+                                break;
+                            case("sunflower"):
+                                resultOfImage = "Classification: Sunflower\n\netc";
+                                break;
+                            default:
+
                         }
                     } finally {
                         //Flushes and closes socket
