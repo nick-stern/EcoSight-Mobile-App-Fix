@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.icu.util.Output;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -30,10 +31,18 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.BufferedReader;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -51,6 +60,7 @@ public class Camera extends AppCompatActivity {
     Button SendPhotoBtn;
     ImageView imageview;
     String pathToFile;
+    String resultOfImage;
 
     FusedLocationProviderClient fusedLocationProviderClient;
     Double currentLat;
@@ -115,14 +125,15 @@ public class Camera extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent resultsIntent = new Intent(getApplicationContext(), Results.class);
-                resultsIntent.putExtra("lat",latitude);
-                resultsIntent.putExtra("lon",longitude);
-                resultsIntent.putExtra("name",name);
-                resultsIntent.putExtra("fp",filePath);
 
                 //send image to python socket server
                 send sendimg = new send();
                 sendimg.execute();
+
+                resultsIntent.putExtra("lat",latitude);
+                resultsIntent.putExtra("lon",longitude);
+                resultsIntent.putExtra("name",name);
+                resultsIntent.putExtra("fp",filePath);
 
                 startActivity(resultsIntent);
             }
@@ -220,8 +231,10 @@ public class Camera extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void...params){
             try { //TODO : change to get IP address of current machine
-                s = new Socket("10.10.188.13",8000); //connects to Leidy's IP address, will need to be changed
+                s = new Socket("192.168.1.96",8000); //connects to Cade's IP address, will need to change
                 InputStream input = new FileInputStream(pathToFile);
+
+                //BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
 
                 try {
                     try {
@@ -229,6 +242,61 @@ public class Camera extends AppCompatActivity {
                         int bytesRead;
                         while ((bytesRead = input.read()) != -1) {
                             s.getOutputStream().write(bytesRead); //Writes bytes to output stream
+                        }
+
+                        BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+                        String result = br.readLine();
+                        switch (result) {
+                            case("buttercup"):
+                                resultOfImage = "Classification: Buttercup\n\netc";
+                                break;
+                            case("coltsfoot"):
+                                resultOfImage = "Classification: Coltsfoot\n\netc";
+                                break;
+                            case("crocus"):
+                                resultOfImage = "Classification: Crocus\n\netc";
+                                break;
+                            case("daffodil"):
+                                resultOfImage = "Classification: Daffodil\n\n";
+                                break;
+                            case("daisy"):
+                                resultOfImage = "Classification: Daisy\n\n";
+                                break;
+                            case("fritillary"):
+                                resultOfImage = "Classification: Fritillary\n\netc";
+                                break;
+                            case("iris"):
+                                resultOfImage = "Classification: Iris\n\netc";
+                                break;
+                            case("lilyvalley"):
+                                resultOfImage = "Classification: Lilyvilley\n\netc";
+                                break;
+                            case("pansy"):
+                                resultOfImage = "Classification: Pansy\n\n";
+                                break;
+                            case("snowdrop"):
+                                resultOfImage = "Classification: Snowdrop\n\netc";
+                                break;
+                            case("sunflower"):
+                                resultOfImage = "Classification: Sunflower\n\n";
+                                break;
+                            case("bluebell"):
+                                resultOfImage = "Classification: Bluebell\n\n";
+                                break;
+                            case("tigerlily"):
+                                resultOfImage = "Classification: Tigerlily\n\netc";
+                                break;
+                            case("cowslip"):
+                                resultOfImage = "Classification: Cowslip\n\n";
+                                break;
+                            case("tulip"):
+                                resultOfImage = "Classification: Tulip\n\n";
+                                break;
+                            case("windflower"):
+                                resultOfImage = "Classification: Windflower\n\netc";
+                                break;
+                            default:
+                                resultOfImage = "Classification: Unknown!\n\n";
                         }
                     } finally {
                         //Flushes and closes socket
